@@ -11,7 +11,10 @@ use axum::{
     response::{Html, Redirect},
     routing::{get, post},
     BoxError, Router,
+    response::IntoResponse, Json,
 };
+
+use serde_json::json;
 use futures::{Stream, TryStreamExt};
 use std::io;
 use tokio::{fs::File, io::BufWriter};
@@ -44,7 +47,7 @@ async fn main() {
 async fn save_request_body(
     Path(file_name): Path<String>,
     request: Request,
-) -> Result<(), (StatusCode, String)> {
+) -> impl IntoResponse {
     stream_to_file(&file_name, request.into_body().into_data_stream()).await;
     Json(json!({"result": "ok"}))
 }
